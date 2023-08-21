@@ -1,16 +1,30 @@
-﻿using System.IO;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 public class Program
 {
   static void Main()
   {
-    using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+    var config = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .Build();
+    
+    using ILoggerFactory loggerFactory = LoggerFactory.Create(
+      builder =>
     {
       builder.AddConsole();
-      //    builder.AddJsonConsole();
+      builder.AddEventLog();
+      
+      builder.AddConfiguration(
+        config.GetSection("Logging")
+      );
+      //  builder.AddJsonConsole();
     });
+
+    
+
+
     ILogger logger = loggerFactory.CreateLogger<Program>();
     logger.LogWarning("Casi ocurrio un error");
     logger.LogError("Aqui ocurrio un error");
@@ -19,7 +33,8 @@ public class Program
     try
     {
       logger.LogInformation("Starting up");
-      new AppService(logger).Run();
+      var app = new AppService(logger, config);
+      app.Run();
     }
     catch (Exception ex)
     {
@@ -38,13 +53,21 @@ public class Program
 public class AppService
 {
   private readonly ILogger _logger;
-  public AppService(ILogger logger)
+  private readonly IConfiguration _config;
+  public AppService(ILogger logger, IConfiguration config)
   {
     _logger = logger;
+    _config = config;
   }
 
   public void Run()
   {
+
+    
+    var ruc = _config.GetValue<string>("Sri:Ruc");
+
+    _logger.LogInformation($"Ruc: {ruc}");
+
     var a = 0;
     var b = 4 / a;
     _logger.LogInformation("Running");
