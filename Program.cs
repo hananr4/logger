@@ -6,15 +6,19 @@ public class Program
 {
   static void Main()
   {
-    using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+    using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+    {
+      builder.AddConsole();
+      //    builder.AddJsonConsole();
+    });
     ILogger logger = loggerFactory.CreateLogger<Program>();
     logger.LogWarning("Casi ocurrio un error");
     logger.LogError("Aqui ocurrio un error");
 
 
-     try
+    try
     {
-    logger.LogInformation("Starting up");
+      logger.LogInformation("Starting up");
       new AppService(logger).Run();
     }
     catch (Exception ex)
@@ -22,7 +26,7 @@ public class Program
       logger.LogCritical(ex, "Application start-up failed");
       throw;
     }
-    
+
 
     logger.LogInformation("Starting up");
 
@@ -31,17 +35,20 @@ public class Program
 
 
 
-public class AppService{
-    private readonly ILogger _logger;
-    public AppService (ILogger logger){
-        _logger = logger;
-    }
+public class AppService
+{
+  private readonly ILogger _logger;
+  public AppService(ILogger logger)
+  {
+    _logger = logger;
+  }
 
-    public void Run(){
-      var a = 0;
-      var b = 4/a;
-        _logger.LogInformation("Running");
-    }
+  public void Run()
+  {
+    var a = 0;
+    var b = 4 / a;
+    _logger.LogInformation("Running");
+  }
 }
 
 
